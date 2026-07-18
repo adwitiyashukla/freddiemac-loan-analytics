@@ -1,0 +1,33 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: freddie_postgres
+    environment:
+      POSTGRES_USER: freddie
+      POSTGRES_PASSWORD: freddie
+      POSTGRES_DB: freddie
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ../sql:/sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U freddie -d freddie"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pgadmin:
+    image: dpage/pgadmin4:8
+    container_name: freddie_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@local.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
